@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>رحلة سنع — النسخة الذهبية</title>
+<style>
+:root{
+  --gold-bg:#f6e6c9;
+  --card:#fffdf8;
+  --muted:#6b5a47;
+  --gold:#c99b3a;
+  --brown:#7b4f2b;
+  --accent:#8c5a22;
+  font-family: "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,var(--gold-bg),#f2dfb3);color:#2a2a2a;display:flex;align-items:center;justify-content:center;padding:16px}
+.app{width:100%;max-width:980px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.97));box-shadow:0 14px 40px rgba(20,20,20,0.08)}
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,0.04);background:linear-gradient(90deg, rgba(201,155,58,0.06), transparent)}
+.logo{display:flex;gap:12px;align-items:center}
+.logo .icon{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#ffd27a);display:flex;align-items:center;justify-content:center;font-weight:900;color:#6b3b00;font-size:22px}
+.logo h1{margin:0;font-size:20px}
+.tag{font-size:12px;color:var(--muted)}
+.screen{display:none;padding:18px}
+.screen.active{display:block}
+.card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+.small{font-size:12px;color:var(--muted)}
+.start-btn{background:linear-gradient(90deg,#b67e2b,#6b3b00);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-weight:800;cursor:pointer}
+.start-btn.gray{background:#6b6b6b}
+.map-canvas{min-height:420px;border-radius:12px;padding:16px;position:relative;background:linear-gradient(180deg,#fff6e8,#fffaf0)}
+.stage-dot{position:absolute;width:96px;height:96px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:13px;cursor:pointer;background:rgba(255,255,255,0.95);box-shadow:0 6px 18px rgba(0,0,0,0.06);text-align:center;padding:6px}
+.stage-dot.locked{filter:grayscale(1);opacity:0.6}
+.stage-dot .emoji{font-size:28px}
+.stage-dot .label{margin-top:6px;background:rgba(255,255,255,0.9);padding:4px 6px;border-radius:6px;font-size:13px}
+#s1{left:6%;top:62%}
+#s2{left:28%;top:40%}
+#s3{left:48%;top:66%}
+#s4{left:70%;top:36%}
+#s5{left:84%;top:66%}
+#s6{left:40%;top:18%}
+#s7{left:72%;top:80%}
+.stage-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.stage-title{font-weight:900;font-size:18px}
+.story-area{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.story-text{flex:1}
+.story-image{width:180px;border-radius:8px;object-fit:cover;border:2px solid rgba(0,0,0,0.04);background:#fff;padding:6px}
+.question-area{margin-top:12px}
+.question-title{font-weight:800;margin-bottom:8px}
+.options{display:flex;flex-direction:column;gap:10px}
+.option-btn{background:#fff;border:2px solid rgba(0,0,0,0.04);padding:12px;border-radius:10px;font-weight:800;cursor:pointer;text-align:right}
+.option-btn.correct{border-color:rgba(45,150,45,0.25);background:linear-gradient(90deg,#f3fbf3,#fff)}
+.option-btn.wrong{border-color:rgba(200,60,60,0.12);opacity:0.9}
+.controls{display:flex;gap:8px;align-items:center;margin-top:10px}
+.feedback{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px}
+.badge{width:86px;height:86px;border-radius:50%;background:linear-gradient(135deg,#ffd27a,#f6c34d);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 8px 30px rgba(0,0,0,0.08)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center}
+.modal .box{background:white;padding:16px;border-radius:12px;max-width:700px;width:94%}
+@media (max-width:860px){ .story-image{display:none} .stage-dot{width:78px;height:78px} }
+.top-info{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%}
+.top-info .left, .top-info .right{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="رحلة سنع - النسخة الذهبية">
+  <div class="header">
+    <div class="logo"><div class="icon">س</div><div><h1>رحلة سنع</h1><div class="tag">ذكاء المستقبل... بسنع الأجداد</div></div></div>
+    <div style="width:420px">
+      <!-- أعلى الصفحة: اليمين = فريق/مدرسة ، اليسار = اسم المسابقة -->
+      <div class="top-info">
+        <div class="right">فريق الثميد — مدرسة الثميد للبنات</div>
+        <div class="left">هاكاثون الإمارات تبرمج</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Splash / Intro -->
+  <section id="splash" class="screen active">
+    <div class="card" style="max-width:920px;margin:12px auto;text-align:right">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="flex:1;text-align:right">
+          <div style="font-weight:900;font-size:26px">رحلة سنع — النسخة الذهبية</div>
+          <div class="small" style="margin-top:6px">انضمي إلى ميثا و"تراثي" في مغامرة سريعة تعيد لنا سنع الأجداد.</div>
+        </div>
+        <div style="width:220px;text-align:left">
+          <img src="sheikhs.png" alt="الشيخ زايد والشيخ راشد" style="width:100%;height:110px;object-fit:cover;border-radius:8px" onerror="this.style.display='none'"/>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(90deg, rgba(201,155,58,0.06), transparent);text-align:right">
+        <div style="font-weight:800;margin-bottom:6px">بيانات الفريق للمسابقة</div>
+        <div class="small"><strong>المسابقة:</strong> هاكاثون الإمارات تبرمج</div>
+        <div class="small"><strong>المدرسة:</strong> مدرسة الثميد للبنات</div>
+        <div class="small" style="margin-top:8px"><strong>أسماء الطالبات:</strong></div>
+        <ul style="margin:6px 0 0 0;padding-left:18px;text-align:right">
+          <li>ريم سالم</li>
+          <li>الريم خالد</li>
+          <li>شمايل عبدالله</li>
+          <li>عزه احمد</li>
+        </ul>
+      </div>
+
+      <div style="margin-top:14px;text-align:center">
+        <p style="margin:6px 0">في صباحٍ مشمس وصلت ميثا إلى بيت يدّتها فاطمة… وبين رائحة القهوة وصوت المهباش وجدت جهازًا قديمًا اسمه "تراثي". قال لها: <em>ساعديني أستعيد سنع الأجداد!</em></p>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:10px">
+          <button class="start-btn" id="startBtn">ابدأ الرحلة</button>
+          <button class="start-btn gray" id="downloadBtn">تحميل النسخة (ZIP)</button>
+        </div>
+        <div class="small" style="margin-top:8px">اللعبة: 7 مراحل • أسئلة تفاعلية • قصص شعبية • زر خروج للخريطة في كل سؤال</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Map / Stages -->
+  <section id="map" class="screen">
+    <div class="card" style="padding:12px">
+      <div class="map-canvas card">
+        <svg width="100%" height="100%" style="position:absolute;left:0;top:0;z-index:0" viewBox="0 0 1100 700" preserveAspectRatio="none"><rect width="100%" height="100%" fill="#fff7ea"/></svg>
+        <div id="s1" class="stage-dot" data-stage="1"><div class="emoji">🏠</div><div class="label">مجلس اليدّه</div></div>
+        <div id="s2" class="stage-dot locked" data-stage="2"><div class="emoji">🏺</div><div class="label">السوق القديم</div></div>
+        <div id="s3" class="stage-dot locked" data-stage="3"><div class="emoji">🌴</div><div class="label">المزرعة</div></div>
+        <div id="s4" class="stage-dot locked" data-stage="4"><div class="emoji">🪨</div><div class="label">الكهف الأثري</div></div>
+        <div id="s5" class="stage-dot locked" data-stage="5"><div class="emoji">🇦🇪</div><div class="label">قيام الاتحاد</div></div>
+        <div id="s6" class="stage-dot locked" data-stage="6"><div class="emoji">🎭</div><div class="label">ثقافتنا</div></div>
+        <div id="s7" class="stage-dot locked" data-stage="7"><div class="emoji">🏡</div><div class="label">بيت التراث</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px">
+        <div><div class="small">أوسمة مكتسبة</div><div id="progressText" class="small" style="font-weight:800">وسام السنع 0/7</div></div>
+        <div><button id="openRewards" class="start-btn" style="padding:8px 12px;font-size:13px">ملف إنجاز ميثا</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stage Screen -->
+  <section id="stageScreen" class="screen">
+    <div class="card">
+      <div class="stage-header">
+        <div>
+          <div class="stage-title" id="stageTitle">المرحلة</div>
+          <div class="small" id="stageSubtitle">وصف قصير</div>
+        </div>
+        <div>
+          <button id="exitStage" class="start-btn gray">الخروج للخريطة</button>
+        </div>
+      </div>
+      <div id="stageContent"></div>
+    </div>
+  </section>
+
+  <!-- Feedback -->
+  <section id="feedback" class="screen">
+    <div class="card feedback">
+      <div id="fbContent"></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="fbNext" class="start-btn" style="display:none">التالي</button>
+        <button id="fbMap" class="start-btn gray" style="display:none">العودة للخريطة</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rewards Modal -->
+  <div id="rewardsModal" class="modal" style="display:none">
+    <div class="box"><div class="card"><h3 style="margin-top:0">ملف إنجاز ميثا</h3><div id="medalsBox" style="display:flex;gap:8px;flex-wrap:wrap"></div><div style="margin-top:12px;text-align:left"><button id="closeRewards" class="start-btn">أغلق</button></div></div></div>
+  </div>
+
+  <div class="footer card" style="margin:12px">نموذج أولي • مقدم من فريق مدرسة الثميد للبنات</div>
+</div>
+
+<script>
+/* ---------- State & DOM ---------- */
+const screens = { splash: document.getElementById('splash'), map: document.getElementById('map'), stage: document.getElementById('stageScreen'), feedback: document.getElementById('feedback') };
+const startBtn = document.getElementById('startBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const sDots = document.querySelectorAll('.stage-dot');
+const exitStage = document.getElementById('exitStage');
+const stageContent = document.getElementById('stageContent');
+const stageTitle = document.getElementById('stageTitle');
+const stageSubtitle = document.getElementById('stageSubtitle');
+const fbContent = document.getElementById('fbContent');
+const fbNext = document.getElementById('fbNext');
+const fbMap = document.getElementById('fbMap');
+const progressText = document.getElementById('progressText');
+const rewardsModal = document.getElementById('rewardsModal');
+const openRewards = document.getElementById('openRewards');
+const closeRewards = document.getElementById('closeRewards');
+const medalsBox = document.getElementById('medalsBox');
+
+let state = { currentStage: null, medals: 0, stagesCompleted: {1:false,2:false,3:false,4:false,5:false,6:false,7:false}, stageProgress: {} };
+
+/* ---------- Stage Content ---------- */
+const STAGES = {
+  1: { id:1, title:'المرحلة 1: آداب المجلس', subtitle:'تعلّم آداب الجلوس والضيافة', story:`<div class="story-area"><div class="story-text"><strong>قصة: الضيف الكريم</strong><p>في ليلةٍ عاصفة دخل رجل متعب إلى بيت بسيط. رحّبوا به وقدّموا له القهوة. تعلمت ميثا أن احترام الضيف وانتظار دوره من علامات السنع.</p></div></div>`, questions:[ {q:'لو دخلتي المجلس والقهوة توها مصبوبة، شو تسوين؟', opts:['أمد يدي وآخذ الفنجان على طول','أنتظر المضيف يقدمه وأقول: شكراً','أطلب كوب ماي قبل القهوة'], a:1}, {q:'إذا دخل ضيف كبير في السن، شو تسوين؟', opts:['أجلس مكاني وأسلم وأنا جالسة','أوقف وأسلم عليه وأرحب فيه','أتجاهله وأكمل اللي كنت أسويه'], a:1}, {q:'لو خلصتي الفنجان، شو تسوين؟', opts:['أرجع الفنجان من غير ما أحرّكه','أحرك الفنجان شوي عشان يعرفون أني اكتفيت','ألوّح بإصبعي'], a:1} ], proverb:'من تواضع رفعه الله.' },
+  2: { id:2, title:'المرحلة 2: السوق القديم', subtitle:'الأدوات والمهن التقليدية', story:`<div class="story-area"><div class="story-text"><strong>قصة: الحطّاب والأمانة</strong><p>في السوق، وجد الحطّاب كيس ذهب فأعاده لصاحبه. تصرفت بصدق وأمانة، وتعلمت ميثا أن الأمانة زينة البائع والمشتري.</p></div></div>`, questions:[ {q:'إذا شفت ميزان قديم في السوق، شو كان يستخدمونه؟', opts:['لقياس الطول','وزن البضائع','للزينة فقط'], a:1}, {q:'إذا جاك زبون وما عندك الشي اللي يبيه، شو تسوين؟', opts:['تقول له "ما عندي" وتمشي','تدله على بائع ثاني يساعده','تتجاهله'], a:1}, {q:'هل من الأدب تكاسر البائع؟', opts:['نعم، بس بأدب واحترام','لا، الكاسر عيب دائمًا','أصرخ لين يخفض السعر'], a:0} ], proverb:'الصدق زين، والكذب شين.' },
+  3: { id:3, title:'المرحلة 3: المزرعة', subtitle:'النخيل والتمر والحياة الزراعية', story:`<div class="story-area"><div class="story-text"><strong>قصة: النخلة الطيبة</strong><p>ولد صغير سقى نخلة جدّه حتى كبرت وصارت ثمرتها تكفي القرية. تعلمت ميثا أن الصبر والعناية تثمر خيرًا.</p></div></div>`, questions:[ {q:'أول خطوة في العناية بالنخلة؟', opts:['اختيار الفسيلة','ريّها بماء مالح','قطع جذورها'], a:0}, {q:'شو ترمز له النخلة في حياة الإماراتيين؟', opts:['رمز للكرم والعطاء','رمز للكسل','مجرد شجرة عادية'], a:0}, {q:'عند حصاد التمر، شو تسوين؟', opts:['تاكلينه وتخليه يخرب','تخزينه وتوزيعه على الناس','تتركه في الشمس'], a:1} ], proverb:'الزرع من بذره، والكرم من أصله.' },
+  4: { id:4, title:'المرحلة 4: الكهف الأثري', subtitle:'الرموز والنقوش الأثرية', story:`<div class="story-area"><div class="story-text"><strong>قصة: الراعي والصخرة</strong><p>في الكهف رصدت ميثا نقوشًا قديمة تحكي عن الصقارة والقوافل. عرفَت أن هذه النقوش هي ذاكرة الأجداد.</p></div></div>`, questions:[ {q:'ليش الأجداد كانوا يرسمون رموز على الصخور؟', opts:['عشان يتفاخرون','لتوثيق قصصهم وحياتهم','للزينة فقط'], a:1}, {q:'لو شفت نقش قديم، شو تسوين؟', opts:['المسه وغيريه','أحترمه وأتعلم منه','أرسم فوقه'], a:1}, {q:'شو كانت تدل الرموز القديمة غالبًا؟', opts:['حكايات عن الحيوانات والصيد والرحلات','عن المدن الحديثة','عن الألعاب الإلكترونية'], a:0}, {q:'لما يكتشف الباحثون نقشًا، شو يسوون فيه؟', opts:['يدرسونه ويحافظون عليه','يمسحونه','يبيعونه'], a:0}, {q:'شو نتعلم من هالرموز؟', opts:['أن أجدادنا حكماء وخلّاقين','أنهم كانوا يلعبون فقط','أنهم ما عرفوا شيء عن الكتابة'], a:0} ], proverb:'من حفظ قديمه أمن من جديده.' },
+  5: { id:5, title:'المرحلة 5: قيام الاتحاد', subtitle:'قصة قصيرة ولعبة ترتيب الأحداث', story:`<div class="story-area"><div class="story-text"><strong>قصة: قيام الاتحاد</strong><p>في 2 ديسمبر 1971 اجتمع قادة الإمارات ليؤسسوا دولة واحدة. لعب الشيخ زايد بن سلطان آل نهيان والشيخ راشد بن سعيد آل مكتوم أدوارًا مهمة في تشجيع الوحدة والتعاون بين الإمارات. أثر الاتحاد في أن التراث صار يُحفظ ويُحتفى به على مستوى الوطن كله.</p></div></div>`, orderGame:{instructions:'اضغطي على الأحداث بالترتيب الصحيح (1 → 2 → 3):', items:[{id:'a', text:'اجتماع قادة الإمارات والتخطيط للاتحاد'},{id:'b', text:'توقيع وثيقة الاتحاد وتبادل الدعم'},{id:'c', text:'الاحتفال ببداية دولة الإمارات كوطن واحد'}], correctOrder:['a','b','c']}, questions:[{q:'من كان من القادة المشاركين في تأسيس الاتحاد؟', opts:['الشيخ زايد بن سلطان آل نهيان','شخص آخر','لا أحد'], a:0},{q:'ما أثر الاتحاد على التراث؟', opts:['زاد الاهتمام بالتراث وتوثيقه','قلّ الاهتمام','ما تغيّر شيء'], a:0}], proverb:'إيد وحده ما تصفّق.' },
+  6: { id:6, title:'المرحلة 6: ثقافتنا', subtitle:'قصص، أمثال، وألعاب شعبية', story:`<div class="story-area"><div class="story-text"><strong>مرحلة ثقافتنا</strong><p>هنا تعرض ميثا قصصًا شعبية، أمثالًا، وتعرف ألعابًا قديمة مثل "التيلة" و"الصلّة" و"شد الحبل".</p></div></div>`, interactive:[{type:'story', title:'بو درياه', text:'أسطورة تحكي عن حارس البحر الذي يحمي الصيادين الصادقين.'},{type:'story', title:'جحا والفال', text:'قصص فكاهية وحكم بسيطة.'},{type:'proverb', text:'الجار قبل الدار — احترام الجار من أصول السنع.'},{type:'game', title:'التيلة', text:'لعبة رمي في الرمل لتعزيز التركيز.'}], proverb:'الصبر مفتاح الفرج.' }, 7: { id:7, title:'المرحلة 7: بيت التراث', subtitle:'الختام ورسالة اليدّه', story:`<div class="story-area"><div class="story-text"><strong>الختام: بيت التراث</strong><p>بعد جمع كل المفاتيح والأوسمة فتحت ميثا باب بيت التراث. وجدت رسالة من اليدّه: "التراث ما يعيش في الكتب، يعيش في قلوبنا إذا حفظناه بعملنا وسنعنا." أصبحت ميثا سفيرة للسنع.</p></div></div>`, questions:[{q:'كيف نحافظ على التراث؟', opts:['نتعلمه ونمارسه في حياتنا','نتركه في الكتب فقط','ننساه'], a:0}], proverb:'من لا ماضي له لا حاضر له.' }
+};
+
+/* ---------- Utility functions ---------- */
+function show(screenId){
+  Object.values(screens).forEach(s=>s.classList.remove('active'));
+  screens[screenId].classList.add('active');
+  window.scrollTo(0,0);
+}
+startBtn.addEventListener('click', ()=> show('map'));
+
+// download button - expects ZIP in same folder if you upload it later
+downloadBtn.addEventListener('click', ()=> {
+  const url = 'rahlet-sanaa.zip';
+  window.location.href = url;
+});
+
+/* stage dots click */
+sDots.forEach(dot=>{
+  dot.addEventListener('click', ()=>{
+    const stage = Number(dot.dataset.stage);
+    const playable = (stage === 1) || state.stagesCompleted[stage-1] || !dot.classList.contains('locked');
+    if(playable) openStage(stage);
+    else alert('أكملي المرحلة السابقة أولًا لفتح هذه المرحلة.');
+  });
+});
+
+function openStage(stageId){
+  state.currentStage = stageId;
+  if(state.stageProgress[stageId] === undefined) state.stageProgress[stageId] = 0;
+  renderStage(stageId);
+  show('stage');
+}
+
+function renderStage(id){
+  const st = STAGES[id];
+  stageTitle.textContent = st.title;
+  stageSubtitle.textContent = st.subtitle;
+  let html = '';
+  if(id === 5){
+    html += `<div class="card"><div class="story-area"><div class="story-text">${st.story}</div><div style="width:200px"><img src="sheikhs.png" alt="الشيخ زايد والشيخ راشد" class="story-image" onerror="this.style.display='none'"></div></div></div>`;
+    html += `<div class="card" style="margin-top:10px"><div class="small" style="font-weight:800;margin-bottom:6px">${st.orderGame.instructions}</div><div id="orderList" style="display:flex;flex-direction:column;gap:8px"></div><div style="margin-top:10px;display:flex;gap:8px"><button id="checkOrder" class="start-btn">تحقق من الترتيب</button><button id="resetOrder" class="start-btn gray">إعادة ترتيب</button></div></div>`;
+  } else {
+    html += `<div class="card">${st.story}</div>`;
+  }
+
+  if(st.questions && st.questions.length > 0){
+    html += `<div class="card question-area" id="qArea"></div>`;
+  } else if(st.interactive){
+    html += `<div class="card" id="interactiveArea" style="margin-top:10px"></div>`;
+  } else {
+    html += `<div style="height:12px"></div>`;
+  }
+
+  stageContent.innerHTML = html;
+
+  if(id === 5){
+    setupOrderGame(st.orderGame);
+  }
+
+  if(id === 6 && st.interactive){
+    const ia = document.getElementById('interactiveArea');
+    let inner = '';
+    st.interactive.forEach(it=>{
+      if(it.type === 'story') inner += `<div class="card"><strong>قصة: ${it.title}</strong><p>${it.text}</p></div>`;
+      if(it.type === 'proverb') inner += `<div class="card"><strong>مثل:</strong><p>${it.text}</p></div>`;
+      if(it.type === 'game') inner += `<div class="card"><strong>لعبة: ${it.title}</strong><p>${it.text}</p></div>`;
+    });
+    inner += `<div class="card" style="text-align:center;margin-top:8px"><button id="finishCulture" class="start-btn">أنهي مرحلة ثقافتنا واحصلي على الوسام</button></div>`;
+    ia.innerHTML = inner;
+    document.getElementById('finishCulture').addEventListener('click', ()=> completeStage(6));
+  }
+
+  if(st.questions && st.questions.length > 0){
+    renderQuestionArea(id, 0);
+  }
+}
+
+/* ---------- Order Game (قيام الاتحاد) ---------- */
+function setupOrderGame(game){
+  const orderList = document.getElementById('orderList');
+  orderList.innerHTML = '';
+  const items = [...game.items];
+  items.sort(()=>Math.random()-0.5);
+  items.forEach(it=>{
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.dataset.id = it.id;
+    btn.textContent = it.text;
+    btn.addEventListener('click', ()=>{
+      if(!btn.classList.contains('selected')){
+        btn.classList.add('selected');
+        const sel = document.createElement('div');
+        sel.className = 'small';
+        sel.style.padding = '8px';
+        sel.style.border = '1px solid rgba(0,0,0,0.06)';
+        sel.style.borderRadius = '8px';
+        sel.style.marginTop = '6px';
+        sel.textContent = (orderList.querySelectorAll('.small').length + 1) + '. ' + it.text;
+        sel.dataset.id = it.id;
+        sel.addEventListener('click', ()=> {
+          btn.classList.remove('selected');
+          sel.remove();
+        });
+        orderList.appendChild(sel);
+      }
+    });
+    orderList.appendChild(btn);
+  });
+
+  document.getElementById('checkOrder').onclick = ()=> {
+    const selected = Array.from(orderList.querySelectorAll('.small')).map(d=>d.dataset.id);
+    if(selected.length !== game.correctOrder.length){
+      alert('رجاءً اختاري كل الأحداث بالترتيب ثم اضغطي تحقق.');
+      return;
+    }
+    const ok = selected.every((v,i)=> v === game.correctOrder[i]);
+    if(ok){
+      alert('ترتيب صحيح! الآن جاوبي على باقي أسئلة المرحلة.');
+    } else {
+      alert('الترتيب غير صحيح — جرّبي مرة ثانية أو اضغطي إعادة ترتيب.');
+    }
+  };
+  document.getElementById('resetOrder').onclick = ()=> {
+    openStage(5);
+  };
+}
+
+/* ---------- Questions rendering ---------- */
+function renderQuestionArea(stageId, qIndex){
+  const st = STAGES[stageId];
+  const qArea = document.getElementById('qArea');
+  if(!qArea) return;
+  if(qIndex >= st.questions.length){
+    completeStage(stageId);
+    return;
+  }
+  const q = st.questions[qIndex];
+  let html = `<div class="question-title">سؤال ${qIndex+1}: ${q.q}</div>`;
+  html += `<div class="options" id="opts">`;
+  q.opts.forEach((opt,idx)=> {
+    html += `<button class="option-btn" data-idx="${idx}">${opt}</button>`;
+  });
+  html += `</div>`;
+  html += `<div class="controls"><button id="exitBtn" class="start-btn gray">الخروج للخريطة</button></div>`;
+  qArea.innerHTML = html;
+
+  const opts = qArea.querySelectorAll('.option-btn');
+  opts.forEach(b=>{
+    b.addEventListener('click', ()=>{
+      opts.forEach(x=> x.disabled = true);
+      const idx = Number(b.dataset.idx);
+      if(idx === q.a){
+        b.classList.add('correct');
+        showFeedback(true, 'صح عليك! 🌟');
+        setTimeout(()=> {
+          renderQuestionArea(stageId, qIndex+1);
+        }, 700);
+      } else {
+        b.classList.add('wrong');
+        showFeedback(false, 'حسناً، جرّبي مرة ثانية.');
+        setTimeout(()=> {
+          opts.forEach(x=> x.disabled = false);
+          b.disabled = true;
+          b.classList.remove('wrong');
+        }, 900);
+      }
+    });
+  });
+
+  document.getElementById('exitBtn').addEventListener('click', ()=> show('map'));
+}
+
+/* ---------- Feedback popup ---------- */
+function showFeedback(ok, msg){
+  fbContent.innerHTML = `<div style="font-weight:800">${msg}</div>`;
+  show('feedback');
+  fbNext.style.display = 'inline-block';
+  fbMap.style.display = 'inline-block';
+  fbNext.onclick = ()=> { show('stage'); fbNext.style.display='none'; fbMap.style.display='none'; };
+  fbMap.onclick = ()=> { show('map'); fbNext.style.display='none'; fbMap.style.display='none'; };
+}
+
+/* ---------- Complete stage and medals ---------- */
+function completeStage(id){
+  if(!state.stagesCompleted[id]){
+    state.stagesCompleted[id] = true;
+    state.medals += 1;
+    progressText.textContent = `وسام السنع ${state.medals}/7`;
+    addMedal(STAGES[id].title);
+    const dot = document.querySelector(`.stage-dot[data-stage='${id}']`);
+    if(dot){ dot.style.background = 'linear-gradient(135deg,var(--gold),#ffd27a)'; dot.style.color='#fff'; dot.title = 'منجز'; }
+    const nextDot = document.querySelector(`.stage-dot[data-stage='${id+1}']`);
+    if(nextDot) nextDot.classList.remove('locked');
+  }
+  fbContent.innerHTML = `<div class="badge">✨</div><div style="font-weight:800;margin-top:6px">مبروك! أكملت ${STAGES[id].title}</div><div class="small" style="margin-top:6px">حصلت على +1 وسام</div>`;
+  show('feedback');
+}
+
+/* add medal to rewards modal */
+function addMedal(title){
+  const el = document.createElement('div');
+  el.style.cssText = 'width:120px;text-align:center';
+  el.innerHTML = `<div style="width:80px;height:80px;border-radius:12px;background:linear-gradient(135deg,#ffd27a,#f6c34d);display:flex;align-items:center;justify-content:center;font-weight:800">✨</div><div class="small" style="margin-top:6px">${title}</div>`;
+  medalsBox.appendChild(el);
+}
+
+/* ---------- Controls ---------- */
+exitStage.addEventListener('click', ()=> show('map'));
+openRewards.addEventListener('click', ()=> rewardsModal.style.display='flex');
+closeRewards.addEventListener('click', ()=> rewardsModal.style.display='none');
+document.querySelector(`.stage-dot[data-stage='1']`).classList.remove('locked');
+
+</script>
+</body>
+</html>
